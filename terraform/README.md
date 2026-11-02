@@ -39,4 +39,4 @@ S3 bucket names are global. The client hard-codes `pm-s3-images.s3.us-east-2.ama
 
 - Port 80 on the EC2 instance is open to the internet because API Gateway calls it over a public address. Requests sent straight to the Elastic IP skip the Cognito check.
 - `POST /users` has no authorizer so the Lambda can call it before the user has a token.
-- The Express API still does not verify tokens itself; see the main README.
+- The Express API does not verify tokens itself; it relies on API Gateway's Cognito check.
