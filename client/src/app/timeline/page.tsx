@@ -1,79 +1,64 @@
 "use client";
 
-import { useAppSelector } from "@/app/redux";
 import Header from "@/components/Header";
+import TimelineChart, {
+  type TimelineItem,
+  type TimelineViewMode,
+} from "@/components/TimelineChart";
 import { useGetProjectsQuery } from "@/state/api";
-import { DisplayOption, Gantt, ViewMode } from "gantt-task-react";
-import "gantt-task-react/dist/index.css";
-import React, { useMemo, useState } from "react";
-
-type TaskTypeItems = "task" | "milestone" | "project";
+import { useMemo, useState } from "react";
 
 const Timeline = () => {
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data: projects, isLoading, isError } = useGetProjectsQuery();
 
-  const [displayOptions, setDisplayOptions] = useState<DisplayOption>({
-    viewMode: ViewMode.Month,
-    locale: "en-US",
-  });
+  const [viewMode, setViewMode] = useState<TimelineViewMode>("Month");
 
-  const ganttTasks = useMemo(() => {
+  const timelineItems = useMemo<TimelineItem[]>(() => {
     return (
       projects?.map((project) => ({
-        start: new Date(project.startDate as string),
-        end: new Date(project.endDate as string),
+        start: new Date(project.startDate ?? ""),
+        end: new Date(project.endDate ?? ""),
         name: project.name,
         id: `Project-${project.id}`,
-        type: "project" as TaskTypeItems,
         progress: 50,
-        isDisabled: false,
       })) || []
     );
   }, [projects]);
 
-  const handleViewModeChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setDisplayOptions((prev) => ({
-      ...prev,
-      viewMode: event.target.value as ViewMode,
-    }));
-  };
-
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return <p className="app-page text-muted">Loading timeline...</p>;
   if (isError || !projects)
-    return <div>An error occurred while fetching projects</div>;
+    return (
+      <p role="alert" className="app-page text-ink">
+        Could not load projects.
+      </p>
+    );
 
   return (
-    <div className="max-w-full p-8">
-      <header className="mb-4 flex items-center justify-between">
-        <Header name="Projects Timeline" />
-        <div className="relative inline-block w-64">
+    <div className="app-page">
+      <Header name="Project timeline" />
+      <div className="mb-4 flex items-center justify-end gap-3">
+        <label htmlFor="project-timeline-scale" className="app-label mb-0">
+          Scale
+        </label>
+        <div className="w-36">
           <select
-            className="focus:shadow-outline block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white"
-            value={displayOptions.viewMode}
-            onChange={handleViewModeChange}
+            id="project-timeline-scale"
+            className="app-input"
+            value={viewMode}
+            onChange={(event) =>
+              setViewMode(event.target.value as TimelineViewMode)
+            }
           >
-            <option value={ViewMode.Day}>Day</option>
-            <option value={ViewMode.Week}>Week</option>
-            <option value={ViewMode.Month}>Month</option>
+            <option value="Day">Day</option>
+            <option value="Week">Week</option>
+            <option value="Month">Month</option>
           </select>
         </div>
-      </header>
+      </div>
 
-      <div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary dark:text-white">
-        <div className="timeline">
-          <Gantt
-            tasks={ganttTasks}
-            {...displayOptions}
-            columnWidth={displayOptions.viewMode === ViewMode.Month ? 150 : 100}
-            listCellWidth="100px"
-            projectBackgroundColor={isDarkMode ? "#101214" : "#1f2937"}
-            projectProgressColor={isDarkMode ? "#1f2937" : "#aeb8c2"}
-            projectProgressSelectedColor={isDarkMode ? "#000" : "#9ba1a6"}
-          />
-        </div>
+      <div className="app-panel overflow-hidden">
+        <TimelineChart items={timelineItems} viewMode={viewMode} />
       </div>
     </div>
   );

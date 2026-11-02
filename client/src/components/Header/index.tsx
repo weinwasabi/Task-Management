@@ -1,20 +1,23 @@
-import React from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   name: string;
-  buttonComponent?: any;
+  buttonComponent?: ReactNode;
   isSmallText?: boolean;
 };
 
 const Header = ({ name, buttonComponent, isSmallText = false }: Props) => {
+  const Heading = isSmallText ? "h2" : "h1";
   return (
-    <div className="mb-5 flex w-full items-center justify-between">
-      <h1
-        className={`${isSmallText ? "text-lg" : "text-2xl"} font-semibold dark:text-white`}
+    <div
+      className={`${isSmallText ? "mb-4" : "app-halftone mb-7 border-b border-line pb-6"} relative flex w-full flex-wrap items-center justify-between gap-4 overflow-hidden`}
+    >
+      <Heading
+        className={`${isSmallText ? "text-lg" : "text-3xl leading-none sm:text-[2.75rem]"} relative z-10 font-mono font-semibold tracking-[-0.06em] text-ink`}
       >
         {name}
-      </h1>
-      {buttonComponent}
+      </Heading>
+      <div className="relative z-10">{buttonComponent}</div>
     </div>
   );
 };

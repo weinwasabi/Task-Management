@@ -1,0 +1,9 @@
+aws_region = "ap-southeast-1"
+
+# S3 bucket names are shared by every AWS account; choose one nobody has used.
+images_bucket_name = "task-management-images-your-name"
+
+# Optional: connect Amplify to GitHub for automatic builds. Set the token with
+# TF_VAR_github_access_token instead of saving it in this file.
+# github_repository_url = "https://github.com/your-account/project-management"
+# amplify_branch_name   = "main"

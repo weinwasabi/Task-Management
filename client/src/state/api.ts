@@ -27,7 +27,7 @@ export enum Status {
 export interface User {
   userId?: number;
   username: string;
-  email: string;
+  email?: string;
   profilePictureUrl?: string;
   cognitoId?: string;
   teamId?: number;
@@ -68,7 +68,7 @@ export interface SearchResults {
 }
 
 export interface Team {
-  teamId: number;
+  id: number;
   teamName: string;
   productOwnerUserId?: number;
   projectManagerUserId?: number;
@@ -126,6 +126,10 @@ export const api = createApi({
           ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
           : [{ type: "Tasks" as const }],
     }),
+    getAllTasks: build.query<Task[], void>({
+      query: () => "tasks",
+      providesTags: ["Tasks"],
+    }),
     getTasksByUser: build.query<Task[], number>({
       query: (userId) => `tasks/user/${userId}`,
       providesTags: (result, error, userId) =>
@@ -160,7 +164,7 @@ export const api = createApi({
       providesTags: ["Teams"],
     }),
     search: build.query<SearchResults, string>({
-      query: (query) => `search?query=${query}`,
+      query: (query) => `search?query=${encodeURIComponent(query)}`,
     }),
   }),
 });
@@ -169,6 +173,7 @@ export const {
   useGetProjectsQuery,
   useCreateProjectMutation,
   useGetTasksQuery,
+  useGetAllTasksQuery,
   useCreateTaskMutation,
   useUpdateTaskStatusMutation,
   useSearchQuery,

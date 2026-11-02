@@ -15,28 +15,42 @@ const ListView = ({ id, setIsModalNewTaskOpen }: Props) => {
     isLoading,
   } = useGetTasksQuery({ projectId: Number(id) });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>An error occurred while fetching tasks</div>;
+  if (isLoading) return <p className="py-6 text-muted">Loading tasks...</p>;
+  if (error)
+    return (
+      <p role="alert" className="py-6 text-ink">
+        Could not load tasks.
+      </p>
+    );
 
   return (
-    <div className="px-4 pb-8 xl:px-6">
+    <div className="pb-8">
       <div className="pt-5">
         <Header
           name="List"
           buttonComponent={
             <button
-              className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+              type="button"
+              className="app-button-primary"
               onClick={() => setIsModalNewTaskOpen(true)}
             >
-              Add Task
+              Add task
             </button>
           }
           isSmallText
         />
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-        {tasks?.map((task: Task) => <TaskCard key={task.id} task={task} />)}
-      </div>
+      {tasks?.length ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {tasks.map((task: Task) => (
+            <TaskCard key={task.id} task={task} />
+          ))}
+        </div>
+      ) : (
+        <p className="app-empty">
+          No tasks yet. Add the first task to this project.
+        </p>
+      )}
     </div>
   );
 };

@@ -25,11 +25,7 @@ const columns: GridColDef[] = [
     field: "status",
     headerName: "Status",
     width: 130,
-    renderCell: (params) => (
-      <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-        {params.value}
-      </span>
-    ),
+    renderCell: (params) => <span className="app-badge">{params.value}</span>,
   },
   {
     field: "priority",
@@ -55,13 +51,13 @@ const columns: GridColDef[] = [
     field: "author",
     headerName: "Author",
     width: 150,
-    renderCell: (params) => params.value?.author || "Unknown",
+    renderCell: (params) => params.value?.username || "Unknown",
   },
   {
     field: "assignee",
     headerName: "Assignee",
     width: 150,
-    renderCell: (params) => params.value?.assignee || "Unassigned",
+    renderCell: (params) => params.value?.username || "Unassigned",
   },
 ];
 
@@ -73,31 +69,41 @@ const TableView = ({ id, setIsModalNewTaskOpen }: Props) => {
     isLoading,
   } = useGetTasksQuery({ projectId: Number(id) });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error || !tasks) return <div>An error occurred while fetching tasks</div>;
+  if (isLoading) return <p className="py-6 text-muted">Loading tasks...</p>;
+  if (error || !tasks)
+    return (
+      <p role="alert" className="py-6 text-ink">
+        Could not load tasks.
+      </p>
+    );
 
   return (
-    <div className="h-[540px] w-full px-4 pb-8 xl:px-6">
+    <div className="h-[540px] w-full pb-8">
       <div className="pt-5">
         <Header
           name="Table"
           buttonComponent={
             <button
-              className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+              type="button"
+              className="app-button-primary"
               onClick={() => setIsModalNewTaskOpen(true)}
             >
-              Add Task
+              Add task
             </button>
           }
           isSmallText
         />
       </div>
-      <DataGrid
-        rows={tasks || []}
-        columns={columns}
-        className={dataGridClassNames}
-        sx={dataGridSxStyles(isDarkMode)}
-      />
+      <div className="h-[440px] w-full overflow-x-auto">
+        <div className="h-full min-w-[840px]">
+          <DataGrid
+            rows={tasks || []}
+            columns={columns}
+            className={dataGridClassNames}
+            sx={dataGridSxStyles(isDarkMode)}
+          />
+        </div>
+      </div>
     </div>
   );
 };

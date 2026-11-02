@@ -13,7 +13,7 @@ import {
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 
 const CustomToolbar = () => (
-  <GridToolbarContainer className="toolbar flex gap-2">
+  <GridToolbarContainer className="flex gap-2 border-b border-line p-2">
     <GridToolbarFilterButton />
     <GridToolbarExport />
   </GridToolbarContainer>
@@ -34,23 +34,30 @@ const Teams = () => {
   const { data: teams, isLoading, isError } = useGetTeamsQuery();
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError || !teams) return <div>Error fetching teams</div>;
+  if (isLoading) return <p className="app-page text-muted">Loading teams...</p>;
+  if (isError || !teams)
+    return (
+      <p role="alert" className="app-page text-ink">
+        Could not load teams.
+      </p>
+    );
 
   return (
-    <div className="flex w-full flex-col p-8">
+    <div className="app-page">
       <Header name="Teams" />
-      <div style={{ height: 650, width: "100%" }}>
-        <DataGrid
-          rows={teams || []}
-          columns={columns}
-          pagination
-          slots={{
-            toolbar: CustomToolbar,
-          }}
-          className={dataGridClassNames}
-          sx={dataGridSxStyles(isDarkMode)}
-        />
+      <div className="h-[650px] w-full overflow-x-auto">
+        <div className="h-full min-w-[720px]">
+          <DataGrid
+            rows={teams || []}
+            columns={columns}
+            pagination
+            slots={{
+              toolbar: CustomToolbar,
+            }}
+            className={dataGridClassNames}
+            sx={dataGridSxStyles(isDarkMode)}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../db.js";
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -16,6 +14,10 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const { cognitoId } = req.params;
+  if (typeof cognitoId !== "string") {
+    res.status(400).json({ message: "Invalid Cognito ID" });
+    return;
+  }
   try {
     const user = await prisma.user.findUnique({
       where: {

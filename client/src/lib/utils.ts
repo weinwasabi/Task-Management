@@ -1,32 +1,31 @@
 export const dataGridClassNames =
-  "border border-gray-200 bg-white shadow dark:border-stroke-dark dark:bg-dark-secondary dark:text-gray-200";
+  "rounded-2xl border border-line bg-surface text-ink";
 
-export const dataGridSxStyles = (isDarkMode: boolean) => {
-  return {
-    "& .MuiDataGrid-columnHeaders": {
-      color: `${isDarkMode ? "#e5e7eb" : ""}`,
-      '& [role="row"] > *': {
-        backgroundColor: `${isDarkMode ? "#1d1f21" : "white"}`,
-        borderColor: `${isDarkMode ? "#2d3135" : ""}`,
-      },
-    },
-    "& .MuiIconbutton-root": {
-      color: `${isDarkMode ? "#a3a3a3" : ""}`,
-    },
-    "& .MuiTablePagination-root": {
-      color: `${isDarkMode ? "#a3a3a3" : ""}`,
-    },
-    "& .MuiTablePagination-selectIcon": {
-      color: `${isDarkMode ? "#a3a3a3" : ""}`,
-    },
-    "& .MuiDataGrid-cell": {
-      border: "none",
-    },
-    "& .MuiDataGrid-row": {
-      borderBottom: `1px solid ${isDarkMode ? "#2d3135" : "e5e7eb"}`,
-    },
-    "& .MuiDataGrid-withBorderColor": {
-      borderColor: `${isDarkMode ? "#2d3135" : "e5e7eb"}`,
-    },
-  };
-};
+export const dataGridSxStyles = (_isDarkMode: boolean) => ({
+  border: "1px solid rgb(var(--color-line))",
+  borderRadius: "16px",
+  backgroundColor: "rgb(var(--color-surface))",
+  color: "rgb(var(--color-ink))",
+  "& .MuiDataGrid-columnHeaders": {
+    backgroundColor: "rgb(var(--color-subtle))",
+    borderBottom: "1px solid rgb(var(--color-line))",
+    fontFamily: "var(--font-geist-mono), monospace",
+    fontSize: "12px",
+    letterSpacing: "0.02em",
+  },
+  "& .MuiDataGrid-cell": {
+    borderBottom: "1px solid rgb(var(--color-line))",
+  },
+  "& .MuiDataGrid-row:hover": {
+    backgroundColor: "rgb(var(--color-subtle))",
+  },
+  "& .MuiDataGrid-footerContainer": {
+    borderTop: "1px solid rgb(var(--color-line))",
+  },
+  "& .MuiButtonBase-root, & .MuiTablePagination-root": {
+    color: "rgb(var(--color-ink))",
+  },
+  "& .MuiDataGrid-withBorderColor": {
+    borderColor: "rgb(var(--color-line))",
+  },
+});

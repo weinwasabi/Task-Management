@@ -1,15 +1,23 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../db.js";
 
 export const getTasks = async (req: Request, res: Response): Promise<void> => {
   const { projectId } = req.query;
+  const parsedProjectId = Number(projectId);
+
+  if (
+    projectId !== undefined &&
+    (typeof projectId !== "string" ||
+      !Number.isSafeInteger(parsedProjectId) ||
+      parsedProjectId < 1)
+  ) {
+    res.status(400).json({ message: "projectId must be a positive integer" });
+    return;
+  }
+
   try {
     const tasks = await prisma.task.findMany({
-      where: {
-        projectId: Number(projectId),
-      },
+      where: projectId === undefined ? undefined : { projectId: parsedProjectId },
       include: {
         author: true,
         assignee: true,
@@ -18,10 +26,9 @@ export const getTasks = async (req: Request, res: Response): Promise<void> => {
       },
     });
     res.json(tasks);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: `Error retrieving tasks: ${error.message}` });
+  } catch (error) {
+    console.error("Error retrieving tasks", error);
+    res.status(500).json({ message: "Could not retrieve tasks" });
   }
 };
 

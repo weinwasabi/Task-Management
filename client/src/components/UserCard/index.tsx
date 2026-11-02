@@ -1,6 +1,4 @@
 import { User } from "@/state/api";
-import Image from "next/image";
-import React from "react";
 
 type Props = {
   user: User;
@@ -8,19 +6,12 @@ type Props = {
 
 const UserCard = ({ user }: Props) => {
   return (
-    <div className="flex items-center rounded border p-4 shadow">
-      {user.profilePictureUrl && (
-        <Image
-          src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/p1.jpeg`}
-          alt="profile picture"
-          width={32}
-          height={32}
-          className="rounded-full"
-        />
-      )}
+    <div className="app-panel flex items-center gap-3 p-4">
+      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong bg-subtle font-mono text-sm font-semibold text-ink">
+        {user.username.charAt(0).toUpperCase()}
+      </span>
       <div>
-        <h3>{user.username}</h3>
-        <p>{user.email}</p>
+        <h3 className="font-medium text-ink">{user.username}</h3>
       </div>
     </div>
   );

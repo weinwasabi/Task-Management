@@ -33,11 +33,7 @@ const columns: GridColDef[] = [
     field: "status",
     headerName: "Status",
     width: 130,
-    renderCell: (params) => (
-      <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-        {params.value}
-      </span>
-    ),
+    renderCell: (params) => <span className="app-badge">{params.value}</span>,
   },
   {
     field: "priority",
@@ -63,13 +59,13 @@ const columns: GridColDef[] = [
     field: "author",
     headerName: "Author",
     width: 150,
-    renderCell: (params) => params.value.username || "Unknown",
+    renderCell: (params) => params.value?.username || "Unknown",
   },
   {
     field: "assignee",
     headerName: "Assignee",
     width: 150,
-    renderCell: (params) => params.value.username || "Unassigned",
+    renderCell: (params) => params.value?.username || "Unassigned",
   },
 ];
 
@@ -77,7 +73,9 @@ const ReusablePriorityPage = ({ priority }: Props) => {
   const [view, setView] = useState("list");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
-  const { data: currentUser } = useGetAuthUserQuery({});
+  const { data: currentUser, isLoading: isUserLoading } = useGetAuthUserQuery(
+    {},
+  );
   const userId = currentUser?.userDetails?.userId ?? null;
   const {
     data: tasks,
@@ -93,63 +91,81 @@ const ReusablePriorityPage = ({ priority }: Props) => {
     (task: Task) => task.priority === priority,
   );
 
-  if (isTasksError || !tasks) return <div>Error fetching tasks</div>;
+  if (isUserLoading || isLoading)
+    return <p className="app-page text-muted">Loading tasks...</p>;
+  if (isTasksError || !tasks)
+    return (
+      <p role="alert" className="app-page text-ink">
+        Could not load tasks.
+      </p>
+    );
 
   return (
-    <div className="m-5 p-4">
+    <div className="app-page">
       <ModalNewTask
         isOpen={isModalNewTaskOpen}
         onClose={() => setIsModalNewTaskOpen(false)}
       />
       <Header
-        name="Priority Page"
+        name={`${priority} priority`}
         buttonComponent={
           <button
-            className="mr-3 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+            type="button"
+            className="app-button-primary"
             onClick={() => setIsModalNewTaskOpen(true)}
           >
-            Add Task
+            Add task
           </button>
         }
       />
-      <div className="mb-4 flex justify-start">
+      <div
+        role="group"
+        aria-label="Task view"
+        className="mb-5 flex justify-start gap-2"
+      >
         <button
-          className={`px-4 py-2 ${
-            view === "list" ? "bg-gray-300" : "bg-white"
-          } rounded-l`}
+          type="button"
+          aria-pressed={view === "list"}
+          className={
+            view === "list" ? "app-button-primary" : "app-button-secondary"
+          }
           onClick={() => setView("list")}
         >
           List
         </button>
         <button
-          className={`px-4 py-2 ${
-            view === "table" ? "bg-gray-300" : "bg-white"
-          } rounded-l`}
+          type="button"
+          aria-pressed={view === "table"}
+          className={
+            view === "table" ? "app-button-primary" : "app-button-secondary"
+          }
           onClick={() => setView("table")}
         >
           Table
         </button>
       </div>
-      {isLoading ? (
-        <div>Loading tasks...</div>
+      {!filteredTasks?.length ? (
+        <p className="app-empty">No {priority.toLowerCase()} tasks yet.</p>
       ) : view === "list" ? (
-        <div className="grid grid-cols-1 gap-4">
-          {filteredTasks?.map((task: Task) => (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {filteredTasks.map((task: Task) => (
             <TaskCard key={task.id} task={task} />
           ))}
         </div>
       ) : (
         view === "table" &&
         filteredTasks && (
-          <div className="z-0 w-full">
-            <DataGrid
-              rows={filteredTasks}
-              columns={columns}
-              checkboxSelection
-              getRowId={(row) => row.id}
-              className={dataGridClassNames}
-              sx={dataGridSxStyles(isDarkMode)}
-            />
+          <div className="h-[560px] w-full overflow-x-auto">
+            <div className="h-full min-w-[900px]">
+              <DataGrid
+                rows={filteredTasks}
+                columns={columns}
+                checkboxSelection
+                getRowId={(row) => row.id}
+                className={dataGridClassNames}
+                sx={dataGridSxStyles(isDarkMode)}
+              />
+            </div>
           </div>
         )
       )}
