@@ -3,6 +3,8 @@ server/node_modules
 client/dist/
 server/dist/
 client/.env
+client/.env.local
 server/.env
 client/.next/
 server/src/generated/prisma/
+.DS_Store
